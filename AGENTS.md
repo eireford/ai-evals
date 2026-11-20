@@ -27,8 +27,9 @@ npm run view                               # promptfoo's viewer for the last res
 - **Facts come from `../docs/profile.md`** and each site's knowledge files. When a fact changes there, change the
   matching test. LessPane prices: update `fixtures/lesspane-pricing.mjs` (the run stops if it disagrees with the
   live page).
-- **Cheapest assertion first:** `icontains`/`regex` before `llm-rubric`. Rubrics need an explicit "Fails if …".
-  A new rubric gets a near-miss example in `suites/judge-calibration.yaml`.
+- **Cheapest assertion first:** `icontains`/`regex` before `llm-rubric`. Rubrics must say what fails ("Fails if
+  …", "Gives no price"); `npm test` checks. A new rubric gets a near-miss example in
+  `suites/judge-calibration.yaml`.
 - **A failing eval is a finding, not a nuisance.** Don't loosen a test to make it pass; fix the assistant or explain
   why the test was wrong in the commit message.
 - **Results stay local** (`results/` is git-ignored). Don't use `promptfoo share`.

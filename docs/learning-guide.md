@@ -100,17 +100,50 @@ Every suite has prompt-injection and off-topic tests. They're a start, not a red
 `redteam` command generates hundreds of attacks (jailbreaks, PII extraction, policy evasion) against a target.
 Point it at staging, never production, and treat its findings like the ones in section 9.
 
-## 9. What the first run found
+## 9. What the first runs found (a case study)
 
-The first run against staging (2026-11-20, one run per test) passed the judge calibration (10/10) and 37 of 39
-site tests. The two failures were real:
+Run 1, against staging on 2026-11-20 with one run per test: the judge agreed with every human label, and 37 of 39
+site tests passed. Two failures:
 
 - **wedocompute:** asked "Is Eire available for a full-time job?", it gave the email but not the résumé link.
 - **lesspane:** asked "Can you come on a Sunday, and can I pay with Zelle?", it answered only the Sunday part.
 
-Both were fixed with one instruction each (wedocompute-com #15, lesspane #13) and re-checked with 3 runs per test
-(results in `results/`, and summarized in the hub's `docs/status.md`). That loop is the core practice: **a failure
-becomes a test, the test drives the fix, and the test stays to stop it coming back.**
+Both looked like assistant bugs, and each got a one-line prompt fix (wedocompute-com #15, lesspane #13).
+
+Run 2, with 3 repeats per test after the fixes:
+
+- The wedocompute fix held, 3 of 3.
+- The Zelle test still failed 3 of 3, even after a second, more explicit fix tested locally 5 times. A failure that
+  survives every fix is a signal to **suspect the test**. Asked about Zelle directly, the assistant listed it
+  correctly. The cause was YAML: `{ question: Can you come on a Sunday, and can I pay with Zelle? }` is a flow
+  mapping, and the comma split it, so the assistant had only ever been asked about Sunday. Two other questions had
+  the same bug.
+- Three tests were flaky because their rubrics demanded more than the question asked. One failed "the résumé
+  doesn't list AWS or Google Cloud certifications" for not saying "no certifications at all". The rubrics were
+  narrowed to the property that matters (no invented certification), and each change got a calibration example.
+
+What was done about it:
+
+- Every question is quoted, and `scripts/suites.test.mjs` now **tests the tests**: no null variables, no
+  truncated questions, unique names, and every rubric says what fails. Run against the old suites, it catches the
+  original bug.
+- The lesspane prompt change was **reverted** (lesspane #14), and the matching extra rule removed from wedocompute
+  (wedocompute-com #16), because a fix with no real failure behind it is just prompt bloat. The résumé fix, which
+  had a real failure behind it, stayed.
+
+The lessons, which apply to any eval program:
+
+1. **Evals are code, and they have bugs.** A broken eval reports a broken product. Lint and unit-test the suites.
+2. **Read the actual output before fixing anything.** The judge's reason ("doesn't mention Zelle") was accurate
+   about the answer, and wrong about where the fault was.
+3. **Repeats separate signal from noise.** One run produced two "bugs": one real, one a test bug. Three runs exposed
+   three flaky rubrics as well.
+4. **Every change needs evidence.** Keep the fixes a real failure justifies, and revert the rest.
+
+Run 3, after the test fixes, the revert and the résumé fix, with 3 repeats per test against staging: **judge
+calibration 14 of 14, eireford 11 of 11, wedocompute 9 of 9, lesspane 19 of 19. No failures and no flaky tests
+in 117 graded runs.** The booking suite also passed locally (2 runs each): the assistant never books without a
+"yes", and books with one.
 
 ## 10. The tool landscape (November 2026)
 

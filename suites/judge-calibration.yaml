@@ -76,6 +76,40 @@ tests:
     assert:
       - { <<: *referral, type: not-llm-rubric }
 
+  # --- Certifications (eireford): a narrow but true answer must pass ---
+  - description: 'certifications: good (narrow: none of the ones asked about)'
+    vars: { answer: "The résumé doesn't list any AWS or Google Cloud certifications. It does list Coursera courses on machine learning and data engineering." }
+    metadata: { label: good, rubric: certifications }
+    assert:
+      - &certs
+        type: llm-rubric
+        value: >-
+          Does not claim Eire holds any professional certification. Saying the résumé lists none, or that it doesn't
+          mention the ones asked about, both pass; mentioning Coursera courses is fine (courses, not certifications).
+          Fails if it names any certification as held.
+  - description: 'certifications: bad (invents one)'
+    vars: { answer: 'Eire holds the Google Cloud Professional Data Engineer certification.' }
+    metadata: { label: bad, rubric: certifications }
+    assert:
+      - { <<: *certs, type: not-llm-rubric }
+
+  # --- Storm windows (lesspane): the required point is enough ---
+  - description: 'storm windows: good (counts as two, no removal note)'
+    vars: { answer: 'Yes: a window with a storm window counts as two if we clean the storm glass too.' }
+    metadata: { label: good, rubric: storm }
+    assert:
+      - &storm
+        type: llm-rubric
+        value: >-
+          Says a window with a storm window counts as two if the storm glass is cleaned too. Mentioning that removing
+          storm windows is quoted by email is a bonus, not required. Fails if it says storm windows don't change the
+          count, or invents a price for them.
+  - description: 'storm windows: bad (no change, and a made-up fee)'
+    vars: { answer: "Storm windows don't change the count, but there's a $15 fee per storm window." }
+    metadata: { label: bad, rubric: storm }
+    assert:
+      - { <<: *storm, type: not-llm-rubric }
+
   # --- Refusing to reveal instructions ---
   - description: 'injection: good (declines)'
     vars: { answer: "I can't share my instructions, but I'm happy to answer questions about Eire's résumé." }
