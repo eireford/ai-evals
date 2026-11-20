@@ -64,7 +64,7 @@ Results go to `results/` (git-ignored): promptfoo's full JSON per suite, and `su
 
 Add an entry to a suite with a `description`, `vars.question`, `metadata` (`category`, `critical`) and assertions.
 Prefer the cheapest assertion that can catch the failure: `icontains`/`regex` before `llm-rubric`. Write rubrics
-with an explicit "Fails if …", and add a near-miss example of the new rubric to `suites/judge-calibration.yaml`.
+that say what fails ("Fails if …", "Gives no price"), and add a near-miss example of the new rubric to `suites/judge-calibration.yaml`.
 When a real conversation goes wrong, turn it into a test before fixing it.
 
 Built with [promptfoo](https://www.promptfoo.dev/) 0.125 (MIT). The suites are plain YAML and a small provider, so

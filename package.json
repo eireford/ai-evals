@@ -17,6 +17,7 @@
     "view": "promptfoo view"
   },
   "dependencies": {
+    "js-yaml": "5.4.3",
     "promptfoo": "0.125.1"
   }
 }
