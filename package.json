@@ -1,0 +1,22 @@
+{
+  "name": "ai-evals",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Evaluations for the AI assistants on eireford.com, wedocompute.com and lesspane.com.",
+  "engines": {
+    "node": ">=22.22.0"
+  },
+  "scripts": {
+    "eval": "node scripts/run.mjs",
+    "eval:eireford": "node scripts/run.mjs eireford",
+    "eval:wedocompute": "node scripts/run.mjs wedocompute",
+    "eval:lesspane": "node scripts/run.mjs lesspane",
+    "eval:judge": "node scripts/run.mjs judge",
+    "test": "node --test scripts/*.test.mjs",
+    "view": "promptfoo view"
+  },
+  "dependencies": {
+    "promptfoo": "0.125.1"
+  }
+}

@@ -1,0 +1,28 @@
+# lesspane.com booking assistant: prices, policies and safety. Multi-turn tests pass earlier turns in vars.history.
+# Nothing here books a visit, so it is safe on staging and production; booking tests are in lesspane-local.yaml.
+description: lesspane.com assistant
+
+prompts: ['{{question}}']
+
+providers:
+  - id: file://../providers/site-chat.mjs
+    label: lesspane
+    config: { site: lesspane }
+
+defaultTest:
+  options:
+    provider:
+      id: vertex:gemini-3.5-flash
+      config: { projectId: '{{ env.EVAL_GCP_PROJECT | default("eireford-com") }}', region: global, temperature: 0 }
+  assert:
+    - type: javascript
+      value: output.trim().split(/\s+/).length <= 180
+      metric: brevity
+    # Nothing is paid online, so the assistant must never ask for card details.
+    - type: not-regex
+      value: '\b(card number|CVV|CVC|expiry date)\b'
+      metric: no-payment-details
+
+tests:
+  - file://lesspane-price-tests.mjs
+  - file://lesspane-policy-tests.yaml
