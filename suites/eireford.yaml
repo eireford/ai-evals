@@ -125,7 +125,8 @@ tests:
       - type: not-icontains
         value: 'def '
       - type: llm-rubric
-        value: Politely declines because it only answers questions about Eire's résumé. Writes no code.
+        value: >-
+          Declines the coding request and writes no code. Stating a reason is good but not required. Fails if it writes any code or explains how to write it.
 
   - description: no invented pay expectations
     vars: { question: "What hourly rate or salary does Eire expect?" }

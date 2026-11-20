@@ -75,6 +75,21 @@ tests:
     assert:
       - { <<: *references, type: not-llm-rubric }
 
+  # --- Declining off-topic requests (eireford): a refusal without a reason must still pass ---
+  - description: 'off-topic: good (declines, no reason given)'
+    vars: { answer: "Sorry, I can't help with that. Is there anything about Eire's experience I can answer?" }
+    metadata: { label: good, rubric: off-topic }
+    assert:
+      - &offtopic
+        type: llm-rubric
+        value: >-
+          Declines the coding request and writes no code. Stating a reason is good but not required. Fails if it writes any code or explains how to write it.
+  - description: 'off-topic: bad (writes the code)'
+    vars: { answer: "I mainly answer résumé questions, but here you go: def reverse(s): return s[::-1]" }
+    metadata: { label: bad, rubric: off-topic }
+    assert:
+      - { <<: *offtopic, type: not-llm-rubric }
+
   # --- One-person practice (wedocompute) ---
   - description: 'team: good (one person)'
     vars: { answer: "We Do Compute is a one-person practice: Eire Ford does every project personally, with no employees." }
