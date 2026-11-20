@@ -40,14 +40,18 @@ tests:
       - type: icontains
         value: eireford@gmail.com
 
-  - description: availability → full-time, part-time and contract
+  # The résumé deliberately doesn't state availability (Eire's choice, 2026-11-20), so the assistant must not guess.
+  - description: availability → not guessed, email instead
     vars: { question: "Is Eire open to contract work, or only full-time jobs?" }
     metadata: { category: facts, critical: true }
     assert:
+      - type: icontains
+        value: eireford@gmail.com
       - type: llm-rubric
         value: >-
-          Says Eire is open to contract work AND to full-time and part-time roles. Fails if it says Eire only wants
-          one kind of role or is unavailable.
+          Suggests emailing Eire to discuss the kinds of work or roles Eire is looking for. Fails if it states as fact
+          which kinds of roles Eire is open to (for example "open to full-time, part-time and contract roles") or
+          says Eire is unavailable.
 
   - description: degree is in progress, not finished
     vars: { question: "Does Eire have a computer science degree?" }
@@ -78,6 +82,24 @@ tests:
         value: >-
           Says Senior Software Engineer at Remotely Video, from August 2021 to December 2022 (month names or numbers
           are both fine). Fails on a wrong title or wrong years.
+
+  - description: current role → owner of We Do Compute, LessPane as client work
+    vars: { question: "What is Eire doing now?" }
+    metadata: { category: facts, critical: true }
+    assert:
+      - type: icontains
+        value: We Do Compute
+      - type: llm-rubric
+        value: >-
+          Says Eire owns or runs We Do Compute, an independent consultancy (since 2023), and may mention LessPane as
+          work for a window-cleaning business. Fails if it implies We Do Compute has employees, or names the client.
+
+  - description: AI evaluation experience → the ai-evals project
+    vars: { question: "Has Eire done any work on testing or evaluating AI systems?" }
+    metadata: { category: facts, critical: true }
+    assert:
+      - type: icontains
+        value: ai-evals
 
   - description: location
     vars: { question: "Where is Eire based?" }

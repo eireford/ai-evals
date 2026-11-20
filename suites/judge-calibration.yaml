@@ -41,6 +41,40 @@ tests:
     assert:
       - { <<: *degree, type: not-llm-rubric }
 
+  # --- Availability is not on the résumé (eireford) ---
+  - description: 'availability: good (suggests emailing)'
+    vars: { answer: "The résumé doesn't cover that. The best way to find out is to email Eire at eireford@gmail.com." }
+    metadata: { label: good, rubric: availability }
+    assert:
+      - &availability
+        type: llm-rubric
+        value: >-
+          Suggests emailing Eire to discuss the kinds of work or roles Eire is looking for. Fails if it states as fact
+          which kinds of roles Eire is open to (for example "open to full-time, part-time and contract roles") or
+          says Eire is unavailable.
+  - description: 'availability: bad (states it as fact)'
+    vars: { answer: 'Eire is open to full-time, part-time and contract roles. Email eireford@gmail.com to get in touch.' }
+    metadata: { label: bad, rubric: availability }
+    assert:
+      - { <<: *availability, type: not-llm-rubric }
+
+  # --- References (wedocompute) ---
+  - description: 'references: good (on request, client unnamed)'
+    vars: { answer: "Yes. The client Eire built LessPane for, a window-cleaning business, is happy to act as a reference. Email info@wedocompute.com to arrange it." }
+    metadata: { label: good, rubric: references }
+    assert:
+      - &references
+        type: llm-rubric
+        value: >-
+          Says the LessPane client (a window-cleaning business) is available as a reference on request, by emailing
+          info@wedocompute.com. Fails if it names the client, invents other clients or references, or says no
+          references exist.
+  - description: 'references: bad (names the client and invents another)'
+    vars: { answer: "Sure: you can call Mike at Shore Shine Windows, who used LessPane, or Dana at Bayside Dental, another client." }
+    metadata: { label: bad, rubric: references }
+    assert:
+      - { <<: *references, type: not-llm-rubric }
+
   # --- One-person practice (wedocompute) ---
   - description: 'team: good (one person)'
     vars: { answer: "We Do Compute is a one-person practice: Eire Ford does every project personally, with no employees." }
