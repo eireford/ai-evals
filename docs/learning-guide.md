@@ -145,6 +145,17 @@ calibration 14 of 14, eireford 11 of 11, wedocompute 9 of 9, lesspane 19 of 19. 
 in 117 graded runs.** The booking suite also passed locally (2 runs each): the assistant never books without a
 "yes", and books with one.
 
+Later the same day, a second tool found a gap these suites missed. DeepEval evals inside wedocompute-com's backend
+(`backend/evals/`, wedocompute-com #20) check every fact in an answer against the brief the model was given. Asked
+"Who has Eire worked for?", the assistant said "Eire's past employers **and clients** include Remotely Video, DF
+Studio…" in 3 of 4 runs. The suite here had a test for invented clients, but its rubric allowed past employers to
+be mentioned, so it never asked whether they were called clients. The fix (wedocompute-com #21) is one rule in the
+instructions. The finding became a test here, `past employers → employers, never clients`, with a regex for the
+grouped wording and a rubric with three calibration examples. Against staging, without the fix, it failed 1 of 4
+runs; both the regex and the judge caught it. Against a local backend with the fix it passed 4 of 4, and so did the
+other 10 tests. The lesson: **a second method looks for different failures.** Each check in a suite covers what its
+author thought to ask.
+
 ## 10. The tool landscape (November 2026)
 
 No single tool wins. Choose by job.
@@ -152,7 +163,7 @@ No single tool wins. Choose by job.
 | Tool | What it is | Best for |
 | --- | --- | --- |
 | **promptfoo** (used here) | Open-source CLI with YAML configs, many providers including raw HTTP, LLM-as-judge assertions, red teaming, CI gating | Black-box tests of deployed endpoints across stacks; CI gates; red teaming. Acquired by OpenAI (announced March 2026), which says the MIT project continues; that's a vendor risk, and keeping suites in plain YAML keeps them portable |
-| **DeepEval** | Pytest-style framework with many built-in metrics | Python codebases that want evals inside their test suite |
+| **DeepEval** (used in wedocompute-com's backend) | Pytest-style framework with many built-in metrics | Python codebases that want evals inside their test suite. Calibrate its built-in metrics before trusting them: here its faithfulness metric passed an invented price |
 | **Inspect AI** (UK AI Security Institute) | Python framework for agent and capability evals, with sandboxes | Agentic tasks, tool use and safety research |
 | **Ragas** | Metrics for retrieval-augmented generation | Grading retrieval quality and grounding |
 | **Vertex AI Gen AI evaluation service** | Google's managed evals: adaptive rubrics, agent trajectory and final-response metrics, results in Vertex AI Experiments | These projects are on Vertex, so it's the natural next step for trajectory evals and managed rubric grading |

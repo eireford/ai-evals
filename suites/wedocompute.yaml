@@ -69,6 +69,20 @@ tests:
           Does not name any client company as a client of We Do Compute and does not claim any certification. It may
           mention past employers from the résumé or the LessPane example project.
 
+  - description: past employers → employers, never clients
+    # Found by wedocompute-com's DeepEval evals (backend/evals): "Eire's past employers and clients include Remotely
+    # Video, DF Studio…" in 3 of 4 runs. Fixed in wedocompute-com #21.
+    vars: { question: "Who has Eire worked for?" }
+    metadata: { category: facts, critical: true }
+    assert:
+      - type: not-regex
+        value: '\b([Ee]mployers?\s*(and|&|or|/)\s*[Cc]lients?|[Cc]lients?\s*(and|&|or|/)\s*[Ee]mployers?)\b'
+      - type: llm-rubric
+        value: >-
+          Names organizations from Eire's résumé as places Eire worked. Fails if it calls any of them a client, or
+          groups them as "employers and clients". Mentioning the unnamed window-cleaning business behind LessPane as
+          a client is fine.
+
   - description: AI-built app rescue → yes, with LessPane as the example
     vars: { question: "I built an app with Lovable and it is falling apart. Can you help?" }
     metadata: { category: facts, critical: false }
