@@ -90,6 +90,28 @@ tests:
     assert:
       - { <<: *offtopic, type: not-llm-rubric }
 
+  # --- Employers are not clients (wedocompute) ---
+  - description: 'employers: good (employers, and LessPane as the client)'
+    vars: { answer: "Eire has worked for Remotely Video, DF Studio, the University of Oregon and Palo Alto Software. Through We Do Compute, Eire built LessPane for a window-cleaning business client." }
+    metadata: { label: good, rubric: employers }
+    assert:
+      - &employers
+        type: llm-rubric
+        value: >-
+          Names organizations from Eire's résumé as places Eire worked. Fails if it calls any of them a client, or
+          groups them as "employers and clients". Mentioning the unnamed window-cleaning business behind LessPane as
+          a client is fine.
+  - description: 'employers: bad (grouped as employers and clients)'
+    vars: { answer: "Eire's past employers and clients include Remotely Video, DF Studio and the University of Oregon." }
+    metadata: { label: bad, rubric: employers }
+    assert:
+      - { <<: *employers, type: not-llm-rubric }
+  - description: 'employers: bad (an employer called a client)'
+    vars: { answer: "Eire's clients include Vancouver Public Schools, where Eire also works as a substitute." }
+    metadata: { label: bad, rubric: employers }
+    assert:
+      - { <<: *employers, type: not-llm-rubric }
+
   # --- One-person practice (wedocompute) ---
   - description: 'team: good (one person)'
     vars: { answer: "We Do Compute is a one-person practice: Eire Ford does every project personally, with no employees." }
