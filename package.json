@@ -13,10 +13,13 @@
     "eval:wedocompute": "node scripts/run.mjs wedocompute",
     "eval:lesspane": "node scripts/run.mjs lesspane",
     "eval:judge": "node scripts/run.mjs judge",
+    "eval:agent": "EVAL_TARGET=local node scripts/run.mjs lesspane-agent",
     "test": "node --test scripts/*.test.mjs",
     "view": "promptfoo view"
   },
   "dependencies": {
+    "@google/genai": "3.6.1",
+    "@modelcontextprotocol/sdk": "1.32.2",
     "js-yaml": "5.4.3",
     "promptfoo": "0.125.1"
   }

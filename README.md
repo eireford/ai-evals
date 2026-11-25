@@ -30,8 +30,15 @@ EVAL_REPEAT=10 npm run eval -- judge
 npm run view                      # browse every answer and grade in promptfoo's web viewer
 ```
 
-Targets: `staging` (default), `production`, `local`. The booking tests (`lesspane-local`) create bookings, so they
-run only against a local LessPane dev server: `EVAL_TARGET=local npm run eval -- lesspane-local`.
+Targets: `staging` (default), `production`, `local`. The booking tests (`lesspane-local`, `lesspane-agent`) create
+bookings, so they run only against a local LessPane dev server: `EVAL_TARGET=local npm run eval -- lesspane-local`.
+
+**`lesspane-agent`** (`npm run eval:agent`) tests LessPane from the other side: a real model (Gemini) plays a
+person's own AI assistant and orders through LessPane's MCP server, as an outside agent would
+(`lesspane/docs/agent-ordering-plan.md`). The provider returns `{text, calls}`, so the checks look at what the agent
+did (which tools, with what arguments, how many bookings), not only what it said. It caught two real problems on its
+first runs: a "next Tuesday" booked on a Wednesday, and retries matched by a guessable request id. Both are fixed in
+LessPane. Its MCP requests are paced under LessPane's 20 a minute, and each run cancels its own bookings.
 
 Each site allows 10 chat requests a minute per IP, so tests run one at a time, about 6.5 seconds apart. A full
 staging run with 3 repeats takes about 25 minutes and costs a few cents of Gemini.
@@ -54,6 +61,7 @@ Results go to `results/` (git-ignored): promptfoo's full JSON per suite, and `su
 | Path | What it is |
 | --- | --- |
 | `providers/site-chat.mjs` | The one provider for all three sites: their APIs, pacing, 429 retries, multi-turn history |
+| `providers/mcp-agent.mjs` | Gemini as a customer's own assistant, ordering from LessPane over MCP (local only) |
 | `suites/*.yaml` | Test suites: questions, assertions, judge rubrics |
 | `suites/lesspane-price-tests.mjs` | Price tests generated from the oracle, each job asked several ways |
 | `fixtures/lesspane-pricing.mjs` | The pricing oracle: an independent copy of LessPane's formula |

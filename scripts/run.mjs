@@ -5,6 +5,7 @@
 //   npm run eval -- lesspane           one suite
 //   EVAL_TARGET=production npm run eval -- eireford
 //   EVAL_TARGET=local npm run eval -- lesspane-local     booking tests, needs lesspane's dev server
+//   EVAL_TARGET=local npm run eval -- lesspane-agent     an outside AI agent ordering over MCP, needs the same
 //   EVAL_REPEAT=5 npm run eval -- judge
 //
 // Results: results/<suite>-<target>-<time>.json (promptfoo's full output, viewable with `npm run view`) and a
@@ -24,8 +25,11 @@ const SUITES = {
 	eireford: 'suites/eireford.yaml',
 	wedocompute: 'suites/wedocompute.yaml',
 	lesspane: 'suites/lesspane.yaml',
-	'lesspane-local': 'suites/lesspane-local.yaml'
+	'lesspane-local': 'suites/lesspane-local.yaml',
+	'lesspane-agent': 'suites/lesspane-agent.yaml'
 };
+/** Suites that create bookings: only ever against a local dev server. */
+const LOCAL_ONLY = ['lesspane-local', 'lesspane-agent'];
 const target = process.env.EVAL_TARGET ?? 'staging';
 const repeat = Number(process.env.EVAL_REPEAT ?? 3);
 const asked = process.argv.slice(2);
@@ -34,7 +38,7 @@ const asked = process.argv.slice(2);
 const chosen = asked.length
 	? asked
 	: target === 'local'
-		? ['judge', 'lesspane-local']
+		? ['judge', 'lesspane-local', 'lesspane-agent']
 		: ['judge', 'eireford', 'wedocompute', 'lesspane'];
 
 for (const name of chosen) {
@@ -42,8 +46,8 @@ for (const name of chosen) {
 		console.error(`Unknown suite "${name}". Choose from: ${Object.keys(SUITES).join(', ')}.`);
 		process.exit(2);
 	}
-	if (name === 'lesspane-local' && target !== 'local') {
-		console.error('lesspane-local creates bookings, so it only runs with EVAL_TARGET=local.');
+	if (LOCAL_ONLY.includes(name) && target !== 'local') {
+		console.error(`${name} creates bookings, so it only runs with EVAL_TARGET=local.`);
 		process.exit(2);
 	}
 }
@@ -73,7 +77,7 @@ let failed = 0;
 const summaries = [];
 
 for (const name of chosen) {
-	if (name === 'lesspane') await checkLesspaneOracle();
+	if (name === 'lesspane' || name === 'lesspane-agent') await checkLesspaneOracle();
 	const out = path.join('results', `${name}-${name === 'judge' ? 'fixed' : target}-${stamp}.json`);
 	console.log(`\n▶ ${name} (${name === 'judge' ? 'fixed answers' : target}), ${repeat} run(s) per test`);
 	const result = spawnSync(

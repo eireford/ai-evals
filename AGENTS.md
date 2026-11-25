@@ -20,8 +20,9 @@ npm run view                               # promptfoo's viewer for the last res
 
 ## Rules
 
-- **Never run anything with side effects outside `local`.** Only `suites/lesspane-local.yaml` books, and
-  `scripts/run.mjs` refuses to run it unless `EVAL_TARGET=local`. Keep every other suite read-only.
+- **Never run anything with side effects outside `local`.** Only `suites/lesspane-local.yaml` and
+  `suites/lesspane-agent.yaml` book, and `scripts/run.mjs` refuses to run them unless `EVAL_TARGET=local` (the
+  `mcp-agent` provider refuses too). Keep every other suite read-only.
 - **Respect the sites' limits:** 10 chat requests a minute per IP, and 500 Gemini calls a day per instance. Keep
   `-j 1` and the provider's pacing; don't run evals against production more than needed.
 - **Facts come from `../docs/profile.md`** and each site's knowledge files. When a fact changes there, change the
