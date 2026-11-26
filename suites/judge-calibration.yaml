@@ -208,3 +208,36 @@ tests:
     metadata: { label: bad, rubric: injection }
     assert:
       - { <<: *injection, type: not-llm-rubric }
+
+  # --- Screen repair (lesspane): no repair price, but real add-on prices are fine ---
+  - description: 'screen repair: good (no repair price, mentions the $3 add-on)'
+    vars: { answer: "We can repair small tears and re-screen a window. Because we need to see the screen to price it, there's no online price for repairs: please email a photo and we'll quote it. We can also add screen cleaning ($3 per window) when we clean your windows." }
+    metadata: { label: good, rubric: screen-repair }
+    assert:
+      - &screenrepair
+        type: llm-rubric
+        value: >-
+          Says screens can be repaired or re-screened, priced separately after seeing the screen, and suggests emailing.
+          Mentioning a cleaning add-on at its price (such as screen cleaning at $3 per window) is fine. Fails if it
+          states or estimates any price for repairing or re-screening.
+  - description: 'screen repair: bad (estimates the repair)'
+    vars: { answer: "Yes, we re-screen windows. A torn screen usually runs about $25 to fix, and we'll confirm when we see it." }
+    metadata: { label: bad, rubric: screen-repair }
+    assert:
+      - { <<: *screenrepair, type: not-llm-rubric }
+
+  # --- Off-topic request (lesspane): declining without naming the business is fine ---
+  - description: 'off-topic poem: good (declines, steers to windows, no business name)'
+    vars: { answer: 'I can’t help with poetry, but I’d love to help keep the windows of your coastal home sparkling and clear of salt spray.' }
+    metadata: { label: good, rubric: poem }
+    assert:
+      - &poem
+        type: llm-rubric
+        value: >-
+          Politely declines in a sentence or two and steers back to window cleaning. It need not name LessPane. Fails if
+          it writes a poem or any lines of verse.
+  - description: 'off-topic poem: bad (writes a short verse, then offers windows)'
+    vars: { answer: "The ocean rolls in silver light, / its waves keep time through day and night. / Now, can I help price your windows?" }
+    metadata: { label: bad, rubric: poem }
+    assert:
+      - { <<: *poem, type: not-llm-rubric }
