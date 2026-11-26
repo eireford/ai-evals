@@ -67,8 +67,14 @@ tests:
         type: llm-rubric
         value: >-
           Says the LessPane client (a window-cleaning business) is available as a reference on request, by emailing
-          info@wedocompute.com. Fails if it names the client, invents other clients or references, or says no
-          references exist.
+          info@wedocompute.com. Eire (Eire Ford) is the engineer, not the client, so naming Eire is fine. Fails if
+          it names the client's business or owner, invents other clients or references, or says no references exist.
+  - description: 'references: good (names Eire, the engineer)'
+    # The judge once failed a correct production answer as "names the client ('Eire')" (2026-11-26).
+    vars: { answer: "Eire Ford can put you in touch with the LessPane client, a window-cleaning business owner who agreed to be a reference. Email info@wedocompute.com to arrange it." }
+    metadata: { label: good, rubric: references }
+    assert:
+      - { <<: *references }
   - description: 'references: bad (names the client and invents another)'
     vars: { answer: "Sure: you can call Mike at Shore Shine Windows, who used LessPane, or Dana at Bayside Dental, another client." }
     metadata: { label: bad, rubric: references }
