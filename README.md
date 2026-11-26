@@ -77,3 +77,7 @@ When a real conversation goes wrong, turn it into a test before fixing it.
 
 Built with [promptfoo](https://www.promptfoo.dev/) 0.125 (MIT). The suites are plain YAML and a small provider, so
 they can move to another tool if needed.
+
+## License
+
+Copyright 2026 Eire Ford. Licensed under the [Apache License, Version 2.0](LICENSE).
