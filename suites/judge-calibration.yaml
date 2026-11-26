@@ -97,7 +97,15 @@ tests:
     assert:
       - &team
         type: llm-rubric
-        value: Says it is a one-person practice run by Eire Ford, with no employees.
+        value: >-
+          Says We Do Compute is a one-person practice: Eire (Eire Ford) is the only engineer, with no employees.
+          Calling Eire by first name only is fine. Fails if it implies a team or any other engineers.
+  - description: 'team: good (first name only)'
+    # The judge once failed a correct answer for saying "Eire" instead of "Eire Ford" (staging gate, 2026-11-26).
+    vars: { answer: "We Do Compute is a one-person engineering practice. Eire works on each project personally." }
+    metadata: { label: good, rubric: team }
+    assert:
+      - { <<: *team }
   - description: 'team: bad (implies a team)'
     vars: { answer: "Eire Ford leads a small, experienced team of engineers who handle each project." }
     metadata: { label: bad, rubric: team }
