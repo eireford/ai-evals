@@ -13,13 +13,18 @@ Google credentials: `gcloud auth application-default login`, or `GOOGLE_APPLICAT
 ```bash
 npm ci
 npm test                                   # statistics and pricing-oracle unit tests, no network
-npm run eval                               # judge calibration + all sites on staging, 3 repeats (~25 min)
+npm run eval                               # judge calibration + all sites on staging, 3 repeats (~25 min; rarely needed)
 npm run eval -- lesspane                   # one suite; EVAL_TARGET=staging|production|local; EVAL_REPEAT=N
 npm run view                               # promptfoo's viewer for the last results
 ```
 
 ## Rules
 
+- **Run evals only when an assistant changes.** They cost real Gemini money (roughly $0.10–$0.15 per suite
+  run). Never run them on a push or in a pipeline. Run one site's suite, once on staging, when a release changes
+  that assistant's instructions, facts, tools or model; skip releases that don't. Run `judge` only when rubrics or
+  the judge model change. Don't repeat a passed staging run on production. The hub's `docs/conventions.md` has
+  the full rule.
 - **Never run anything with side effects outside `local`.** Only `suites/lesspane-local.yaml` and
   `suites/lesspane-agent.yaml` book, and `scripts/run.mjs` refuses to run them unless `EVAL_TARGET=local` (the
   `mcp-agent` provider refuses too). Keep every other suite read-only.

@@ -41,7 +41,9 @@ first runs: a "next Tuesday" booked on a Wednesday, and retries matched by a gue
 LessPane. Its MCP requests are paced under LessPane's 20 a minute, and each run cancels its own bookings.
 
 Each site allows 10 chat requests a minute per IP, so tests run one at a time, about 6.5 seconds apart. A full
-staging run with 3 repeats takes about 25 minutes and costs a few cents of Gemini.
+staging run with 3 repeats takes about 25 minutes. The judge and the MCP agent use Gemini 3.5 Flash, so each
+suite run costs roughly $0.10–$0.15 (about $5 on a day of 40 runs). That is why the evals run only when an
+assistant changes, not on every push or release.
 
 ## How a run decides
 
